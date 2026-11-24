@@ -35,17 +35,25 @@ and a local chain tip.
 
 ## Reproduction
 
-Use the exact upstream revision in UPSTREAM.txt.
+Requirements: Bash, Git, SHA-256 utilities and Rust/Cargo.
 
-    git clone https://github.com/Instinctes/nightfall.git
-    cd nightfall
-    git checkout "$(cat ../UPSTREAM.txt)"
-    mkdir -p crates/nightfall-consensus/examples
-    cp ../research/nightpool_share_gate.rs \
-       crates/nightfall-consensus/examples/
-    cargo test --locked -p nightfall-consensus \
-       --example nightpool_share_gate -- \
-       --test-threads=1 --nocapture
+From the research repository root:
+
+    bash verify.sh
+
+The verifier fetches the exact pinned Nightfall commit
+and executes the original 14-test research harness.
+
+It requires successful validation of one block candidate
+by the in-memory Devnet consensus implementation.
+
+No running node or real funds are required.
+
+## Continuous verification
+
+GitHub Actions executes the same verification on Linux.
+The original Android/Termux evidence is in EVIDENCE.md.
+See the Actions tab for independent results.
 
 ## Relationship to PR #80
 

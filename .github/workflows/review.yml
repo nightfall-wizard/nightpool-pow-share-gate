@@ -1,0 +1,39 @@
+name: Nightpool research verification
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Fetch exact research revision
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          DIR="$RUNNER_TEMP/nightpool-research"
+          mkdir -p "$DIR"
+          git -C "$DIR" init -q
+          git -C "$DIR" fetch --depth 1 "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_SHA"
+          git -C "$DIR" checkout --detach -q FETCH_HEAD
+          test "$(git -C "$DIR" rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Prepare stable Rust
+        shell: bash
+        run: |
+          rustup update stable
+          rustup default stable
+
+      - name: Verify canonical Devnet shares
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/nightpool-research"
+          bash verify.sh
